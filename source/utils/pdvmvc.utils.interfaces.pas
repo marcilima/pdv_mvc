@@ -9,7 +9,6 @@ type
   IQueryUtils = interface
     ['{C97D9C62-AB42-4379-815B-7D83FC7EF082}']
     procedure FieldParameter(var AValue: TDictionary<String, Variant>);
-    function SelectWithWhere(Value: Boolean): String;
     function IdPrenchido: Boolean;
     function GerarSqlInsert: string;
     function GerarSqlUpdate: string;

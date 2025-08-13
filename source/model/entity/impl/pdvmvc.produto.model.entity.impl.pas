@@ -29,11 +29,7 @@ type
     function GetPrecoVenda: Currency;
 
   public
-
     class function New: IProduto;
-
-
-
   end;
 implementation
 

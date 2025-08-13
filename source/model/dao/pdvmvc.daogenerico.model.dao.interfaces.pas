@@ -16,8 +16,6 @@ type
     function GetId: Integer;
 
     function GetConexao: IConnection;
-
-
   end;
 
 implementation

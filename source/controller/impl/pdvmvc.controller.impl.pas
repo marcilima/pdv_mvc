@@ -48,10 +48,7 @@ begin
   else
     FDAO.Insert;
 
-
-
   Result := FDAO;
-
 end;
 
 destructor TDAOController.Destroy;

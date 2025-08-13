@@ -22,7 +22,6 @@ type
     class function New(AParent: IInterface): IQueryUtils;
 
     procedure FieldParameter(var AValue: TDictionary<String, Variant>);
-    function SelectWithWhere(Value: Boolean): String;
     function CampoPK: string;
     function IdPrenchido: Boolean;
 
@@ -278,11 +277,6 @@ end;
 function TQueryUtils.GerarSqlSelect: string;
 begin
   Result := 'SELECT * FROM ' + NomeTabela;
-end;
-
-function TQueryUtils.SelectWithWhere(Value: Boolean): String;
-begin
-
 end;
 
 function TQueryUtils.Where: String;
