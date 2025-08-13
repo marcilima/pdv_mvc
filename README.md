@@ -32,3 +32,14 @@ do pedido.
 19. Ter a possibilidade de visualizar pedidos já realizados, por clientes ou geral.
 20. Crie um botão na tela do pedido, que deve ficar visível quando o código do cliente estiver em
 branco, para cancelar um pedido.
+## Instrução de uso(Pré-cadastro)
+1. Cadastrar Cliente
+2. Cadastrar Produto
+## Instrução de uso(Pedido de Venda)
+1. Informe o cliente clicando em "Buscar Cliente"
+2. Informe o produto clicando em "Buscar Produto"
+3. Informe a quantidade e valor unitário e clique em "Adicionar"
+4. Clique em "Salvar Pedido"
+## Binários para Download
+
+https://github.com/marcilima/pdv_mvc/raw/refs/heads/main/bin/pdv_mvc.zip
