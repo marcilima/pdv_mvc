@@ -29,7 +29,7 @@ type
   private
     { Private declarations }
     FConexao: IConnection;
-    FControllerDAO: IDAOController;
+    FEntityManager: IEntityManager;
     procedure ListarPedidos;
     procedure ListarPedidoItens;
     procedure ListarClientes;
@@ -63,36 +63,36 @@ end;
 procedure TFrmListaDados.FormCreate(Sender: TObject);
 begin
   FConexao := TConnectionFiredac.New;
-  FControllerDAO := TDAOController.New(FConexao);
+  FEntityManager := TEntityManager.New(FConexao);
 end;
 
 procedure TFrmListaDados.ListarClientes;
 begin
     lblListaDe.Caption := 'Lista de Clientes';
-  var LCliente := FControllerDAO.Entity.Cliente;
-  dsListaDados.DataSet := FControllerDAO.FindByAll(LCliente);
+  var LCliente := FEntityManager.Entity.Cliente;
+  dsListaDados.DataSet := FEntityManager.FindByAll(LCliente);
 end;
 
 procedure TFrmListaDados.ListarPedidoItens;
 begin
   lblListaDe.Caption := 'Lista de Itens do Pedido';
-  var LPedidoItens := FControllerDAO.Entity.PedidoItem;
-  dsListaDados.DataSet := FControllerDAO.FindByAll(LPedidoItens);
+  var LPedidoItens := FEntityManager.Entity.PedidoItem;
+  dsListaDados.DataSet := FEntityManager.FindByAll(LPedidoItens);
 end;
 
 procedure TFrmListaDados.ListarPedidos;
 begin
   lblListaDe.Caption := 'Lista de Pedidos';
-  var LPedido := FControllerDAO.Entity.Pedido;
-  dsListaDados.DataSet := FControllerDAO.FindByAll(LPedido);
+  var LPedido := FEntityManager.Entity.Pedido;
+  dsListaDados.DataSet := FEntityManager.FindByAll(LPedido);
 
 end;
 
 procedure TFrmListaDados.ListarProdutos;
 begin
   lblListaDe.Caption := 'Lista de Produtos';
-  var LProduto := FControllerDAO.Entity.Produto;
-  dsListaDados.DataSet := FControllerDAO.FindByAll(LProduto);
+  var LProduto := FEntityManager.Entity.Produto;
+  dsListaDados.DataSet := FEntityManager.FindByAll(LProduto);
 end;
 
 class function TFrmListaDados.ShowView(ADadosExibir: TDadosExibir): TResult;

@@ -87,11 +87,6 @@ type
     procedure SetValorTotal(const AValue: Currency);
     function GetValorTotal: Currency;
 
-    procedure AdicionarItem(AItem: IPedidoItem);
-    function GetItens: TList<IPedidoItem>;
-
-    procedure RemoverItem(AItem: IPedidoItem);
-
     property NumeroPedido: Integer read GetNumeroPedido write SetNumeroPedido;
     property CodigoCliente: Integer read GetCodigoCliente write SetCodigoCliente;
     property DataEmissao: TDateTime read GetDataEmissao write SetDataEmissao;

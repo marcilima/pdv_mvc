@@ -61,6 +61,7 @@ object frmPrincipal: TfrmPrincipal
     TitleFont.Height = -12
     TitleFont.Name = 'Segoe UI'
     TitleFont.Style = []
+    OnDblClick = dbgPedidoItensDblClick
     Columns = <
       item
         Expanded = False

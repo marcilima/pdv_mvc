@@ -43,23 +43,23 @@ end;
 procedure TFrmCliente.SalvarCliente;
 var
   LConexao: IConnection;
-  LDAOController: IDAOController;
+  LEntityManager: IEntityManager;
   LCliente: ICliente;
 begin
   LConexao := TConnectionFiredac.New;
 
-  LDAOController := TDAOController.New(LConexao);
+  LEntityManager := TEntityManager.New(LConexao);
 
   try
     LConexao.StartTransaction;
 
-    LCliente := LDAOController.Entity.Cliente;
+    LCliente := LEntityManager.Entity.Cliente;
 
     LCliente.Nome := edtNomeCliente.Text;
     LCliente.Cidade := edtCidade.Text;
     LCliente.UF := edtUF.Text;
 
-    LCliente.Codigo := LDAOController.Salvar(LCliente).GetId;
+    LCliente.Codigo := LEntityManager.Salvar(LCliente).GetId;
 
     edtCodigoCliente.Text := IntToStr(LCliente.Codigo);
     LConexao.CommitTrasaction;

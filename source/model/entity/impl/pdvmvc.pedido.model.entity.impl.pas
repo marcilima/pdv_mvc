@@ -42,34 +42,11 @@ type
   public
     class function New: IPedido;
 
-    procedure AdicionarItem(AItem: IPedidoItem);
-    procedure RemoverItem(AItem: IPedidoItem);
-    //procedure PreencherDataSetItens(ADataSet: TDataSet);
-
-    function GetItens: TList<IPedidoItem>;
   end;
 
 implementation
 
 { TPedido }
-
-procedure TPedido.AdicionarItem(AItem: IPedidoItem);
-begin
-
-  if not (AItem.CodigoProduto > 0) then
-    raise Exception.Create('Informe o código do produto');
-
-  if not (AItem.Quantidade > 0) then
-    raise Exception.Create('Informe a quantidade do produto maior que zero');
-
-  if not (AItem.ValorUnitario > 0) then
-    raise Exception.Create('Informe a ValorUnitario do produto maior que zero');
-
-  AItem.ValorTotal := AItem.Quantidade * AItem.ValorUnitario;
-
-  FValorTotal := FValorTotal + AItem.ValorTotal;
-  FItens.Add(AItem);
-end;
 
 constructor TPedido.Create;
 begin
@@ -92,11 +69,6 @@ begin
   Result := FDataEmissao;
 end;
 
-function TPedido.GetItens: TList<IPedidoItem>;
-begin
-
-end;
-
 function TPedido.GetNumeroPedido: Integer;
 begin
   Result := FNumeroPedido;
@@ -110,13 +82,6 @@ end;
 class function TPedido.New: IPedido;
 begin
   Result := Self.Create;
-end;
-
-procedure TPedido.RemoverItem(AItem: IPedidoItem);
-begin
-  FValorTotal := FValorTotal - AItem.ValorTotal;
-
-  FItens.Remove(AItem);
 end;
 
 procedure TPedido.SetCodigoCliente(const AValue: Integer);

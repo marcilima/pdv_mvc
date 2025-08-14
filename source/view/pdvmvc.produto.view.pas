@@ -52,13 +52,13 @@ var
 begin
   LConexao := TConnectionFiredac.New;
 
-  var LController := TDAOController.New(LConexao);
-  var LProduto := LController.Entity.Produto;
+  var LEntityManager := TEntityManager.New(LConexao);
+  var LProduto := LEntityManager.Entity.Produto;
 
   LProduto.Descricao := edtDescricao.Text;
   LProduto.PrecoVenda := StrToCurrDef(edtPrecoVenda.Text, 0);
 
-  LProduto.Codigo := LController.Salvar(LProduto).GetId;
+  LProduto.Codigo := LEntityManager.Salvar(LProduto).GetId;
 
   edtCodigo.Text := IntToStr(LProduto.Codigo);
 end;

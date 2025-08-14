@@ -8,7 +8,7 @@ uses
   Data.DB;
 
 type
-  IDAOController = interface
+  IEntityManager = interface
     function Entity: IEntity;
     function Salvar(AValue: IInterface): IDAOGenerico;
     function FindByAll(AValue: IInterface): TDataSet;

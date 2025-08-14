@@ -71,6 +71,7 @@ type
     procedure btnCancelarPedidoClick(Sender: TObject);
     procedure edtCodigoClienteChange(Sender: TObject);
     procedure sbLimparClienteClick(Sender: TObject);
+    procedure dbgPedidoItensDblClick(Sender: TObject);
   private
     { Private declarations }
     FPedido: IPedido;
@@ -102,12 +103,21 @@ var
   LDescricaoProduto: string;
 begin
 
+  if not (StrToIntDef(edtCodigoProduto.Text, 0) > 0) then
+    raise Exception.Create('Informe o código do produto');
+
+  if not (StrToIntDef(edtQuantidade.Text, 0) > 0) then
+    raise Exception.Create('Informe a quantidade do produto maior que zero');
+
+  if not (StrToCurrDef(edtValorUnitario.Text, 0) > 0) then
+    raise Exception.Create('Informe a ValorUnitario do produto maior que zero');
+
   btnAdicionar.Caption := 'Adicionar';
   var LConexao := TConnectionFiredac.New;
-  var LControllerDAO := TDAOController.New(LConexao);
-  var LProduto := LControllerDAO.Entity.Produto;
+  var LEntityManager := TEntityManager.New(LConexao);
+  var LProduto := LEntityManager.Entity.Produto;
 
-  LDSProdutos := LControllerDAO.FindByAll(LProduto);
+  LDSProdutos := LEntityManager.FindByAll(LProduto);
 
   if LDSProdutos.Locate('CODIGO', StrToIntDef(edtCodigoProduto.Text, 0), []) then
       LDescricaoProduto := LDSProdutos.FieldByName('DESCRICAO').AsString;
@@ -129,7 +139,8 @@ begin
   mTblItens.Post;
 
   FRecnoItem := 0;
-
+  edtCodigoProduto.Clear;
+  edtNomeProduto.Clear;
 end;
 
 procedure TfrmPrincipal.btnAlterarItemClick(Sender: TObject);
@@ -172,7 +183,7 @@ begin
   FPedido.NumeroPedido := StrToIntDef(edtNumeroPedido.Text, 0);
   FPedido.CodigoCliente := StrToIntDef(edtCodigoCliente.Text, 0);
   var LConexao := TConnectionFiredac.New;
-  var LDaoController := TDAOController.New(LConexao);
+  var LDaoController := TEntityManager.New(LConexao);
   var LCliente := LDaoController.Entity.Cliente;
 
 
@@ -181,10 +192,10 @@ begin
     edtNomeCliente.Text := LDataSetCliente.FieldByName('NOME').AsString;
 
 
-  var LControllerDAO := TDAOController.New(LConexao);
+  var LEntityManager := TEntityManager.New(LConexao);
 
-  var LPedidoItens := LControllerDAO.Entity.PedidoItem;
-  LDataSet := LControllerDAO.FindByAll(LPedidoItens);
+  var LPedidoItens := LEntityManager.Entity.PedidoItem;
+  LDataSet := LEntityManager.FindByAll(LPedidoItens);
 
   PreencherDSPedidoItens(LDataSet);
 
@@ -223,18 +234,18 @@ begin
   while not mTblItens.Eof do
   begin
 
-    var LControllerDAO :=  TDAOController.New(LConexao);
-    var LItem := LControllerDAO.Entity.PedidoItem;
+    var LEntityManager :=  TEntityManager.New(LConexao);
+    var LItem := LEntityManager.Entity.PedidoItem;
     LItem.Codigo := mTblItens.FieldByName('CODIGO').AsInteger;
 
     if LItem.Codigo > 0 then
-      LControllerDAO.Excluir(LItem);
+      LEntityManager.Excluir(LItem);
 
      mTblItens.Next;
   end;
 
-  var LControllerDAO :=  TDAOController.New(LConexao);
-  LControllerDAO.Excluir(FPedido);
+  var LEntityManager :=  TEntityManager.New(LConexao);
+  LEntityManager.Excluir(FPedido);
 
   LimparDadosPedido;
 
@@ -244,21 +255,22 @@ end;
 
 procedure TfrmPrincipal.btnExcluirItemClick(Sender: TObject);
 var
-  LControllerDAO: IDAOController;
+  LEntityManager: IEntityManager;
 begin
   if mTblItens.IsEmpty then
     Exit;
 
   if not (MessageDlg('Deseja Excluir o item do pedido?', mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
     Exit;
+
   var LConexao := TConnectionFiredac.New;
-  LControllerDAO :=  TDAOController.New(LConexao);
-  var LItem := LControllerDAO.Entity.PedidoItem;
+  LEntityManager :=  TEntityManager.New(LConexao);
+  var LItem := LEntityManager.Entity.PedidoItem;
 
   LItem.Codigo := mTblItens.FieldByName('CODIGO').AsInteger;
 
   if LItem.Codigo > 0 then
-    LControllerDAO.Excluir(LItem);
+    LEntityManager.Excluir(LItem);
 
   mTblItens.Delete;
 
@@ -267,7 +279,7 @@ end;
 procedure TfrmPrincipal.btnSalvarPedidoClick(Sender: TObject);
 begin
   var LConexao := TConnectionFiredac.New;
-  var LControllerDAO := TDAOController.New(LConexao);
+  var LEntityManager := TEntityManager.New(LConexao);
   LConexao.StartTransaction;
 
   FPedido.CodigoCliente := StrToIntDef(edtCodigoCliente.Text, 0);
@@ -277,11 +289,11 @@ begin
     if not (FPedido.NumeroPedido > 0) then
     begin
       FPedido.DataEmissao := Now;
-      FPedido.NumeroPedido := LControllerDAO.Salvar(FPedido).GetId;
+      FPedido.NumeroPedido := LEntityManager.Salvar(FPedido).GetId;
       edtNumeroPedido.Text := IntToStr(FPedido.NumeroPedido);
     end
     else
-      LControllerDAO.Salvar(FPedido).GetId;
+      LEntityManager.Salvar(FPedido).GetId;
 
     GravarItensPedido(LConexao);
 
@@ -298,6 +310,11 @@ begin
 
   end;
 
+end;
+
+procedure TfrmPrincipal.dbgPedidoItensDblClick(Sender: TObject);
+begin
+  btnAlterarItemClick(btnAlterarItem);
 end;
 
 procedure TfrmPrincipal.edtCodigoClienteChange(Sender: TObject);
@@ -329,8 +346,8 @@ begin
 
   while not mTblItens.Eof do
   begin
-    var LControllerDAO := TDAOController.New(AConexao);
-    var LItem := LControllerDAO.Entity.PedidoItem;
+    var LEntityManager := TEntityManager.New(AConexao);
+    var LItem := LEntityManager.Entity.PedidoItem;
 
     LItem.Codigo := mTblItens.FieldByName('CODIGO').AsInteger;
     LItem.CodigoProduto := mTblItens.FieldByName('CODIGO_PRODUTO').AsInteger;
@@ -340,7 +357,7 @@ begin
     LItem.ValorUnitario := mTblItens.FieldByName('VALORUNITARIO').AsCurrency;
     LItem.ValorTotal := mTblItens.FieldByName('VALORTOTAL').AsCurrency;
     
-    LId := LControllerDAO.Salvar(LItem).GetId;
+    LId := LEntityManager.Salvar(LItem).GetId;
 
     if not (LItem.Codigo > 0) then
     begin
@@ -376,10 +393,10 @@ var
 begin
   mTblItens.EmptyDataSet;
   var LConexao := TConnectionFiredac.New;
-  var LControllerDAO := TDAOController.New(LConexao);
+  var LEntityManager := TEntityManager.New(LConexao);
 
-  var LProduto := LControllerDAO.Entity.Produto;
-  LDSProdutos := LControllerDAO.FindByAll(LProduto);
+  var LProduto := LEntityManager.Entity.Produto;
+  LDSProdutos := LEntityManager.FindByAll(LProduto);
 
   while not ADS.Eof do
   begin

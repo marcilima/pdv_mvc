@@ -11,7 +11,7 @@ uses
   pdvmvc.connection.model.interfaces;
 
 type
-  TDAOController = class(TInterfacedObject, IDAOController)
+  TEntityManager = class(TInterfacedObject, IEntityManager)
   private
     FEntity: IEntity;
     FDAO: IDAOGenerico;
@@ -19,7 +19,7 @@ type
     constructor Create(AConexao: IConnection);
     destructor Destroy; override;
   public
-    class function New(AConexao: IConnection): IDAOController;
+    class function New(AConexao: IConnection): IEntityManager;
 
     function Entity: IEntity;
     function Salvar(AValue: IInterface): IDAOGenerico;
@@ -35,12 +35,12 @@ uses
 
 { TController }
 
-constructor TDAOController.Create(AConexao: IConnection);
+constructor TEntityManager.Create(AConexao: IConnection);
 begin
   FConexao := AConexao;
 end;
 
-function TDAOController.Salvar(AValue: IInterface): IDAOGenerico;
+function TEntityManager.Salvar(AValue: IInterface): IDAOGenerico;
 begin
   if not Assigned(FDAO) then
     FDAO := TDAOGenerico.New(AValue, FConexao);
@@ -53,13 +53,13 @@ begin
   Result := FDAO;
 end;
 
-destructor TDAOController.Destroy;
+destructor TEntityManager.Destroy;
 begin
 
   inherited;
 end;
 
-function TDAOController.Entity: IEntity;
+function TEntityManager.Entity: IEntity;
 begin
   if not Assigned(FEntity) then
     FEntity := TEntity.new;
@@ -67,7 +67,7 @@ begin
   Result := FEntity;
 end;
 
-procedure TDAOController.Excluir(AValue: IInterface);
+procedure TEntityManager.Excluir(AValue: IInterface);
 begin
   if not Assigned(FDAO) then
     FDAO := TDAOGenerico.New(AValue, FConexao);
@@ -75,7 +75,7 @@ begin
   FDAO.Delete;
 end;
 
-function TDAOController.FindByAll(AValue: IInterface): TDataSet;
+function TEntityManager.FindByAll(AValue: IInterface): TDataSet;
 begin
   if not Assigned(FDAO) then
     FDAO := TDAOGenerico.New(AValue, FConexao);
@@ -83,7 +83,7 @@ begin
   Result := FDAO.FindByAll;
 end;
 
-class function TDAOController.New(AConexao: IConnection): IDAOController;
+class function TEntityManager.New(AConexao: IConnection): IEntityManager;
 begin
   Result := Self.Create(AConexao);
 end;
