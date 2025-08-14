@@ -4,7 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, pdvmvc.dao.controller.impl;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, pdvmvc.dao.controller.impl,
+  pdvmvc.dependencycontainer.utils.impl;
 
 type
   TFrmProduto = class(TForm)
@@ -30,7 +31,7 @@ implementation
 
 uses
   pdvmvc.connection.model.interfaces,
-  pdvmvc.firedac.connection.model.impl;
+  pdvmvc.firedac.connection.model.impl, pdvmvc.model.entity.interfaces;
 
 {$R *.dfm}
 
@@ -49,11 +50,12 @@ end;
 procedure TFrmProduto.SalvarProduto;
 var
   LConexao: IConnection;
+  LProduto: IProduto;
 begin
   LConexao := TConnectionFiredac.New;
 
   var LEntityManager := TEntityManager.New(LConexao);
-  var LProduto := LEntityManager.Entity.Produto;
+  LProduto := Container.Resolve<IProduto>;
 
   LProduto.Descricao := edtDescricao.Text;
   LProduto.PrecoVenda := StrToCurrDef(edtPrecoVenda.Text, 0);

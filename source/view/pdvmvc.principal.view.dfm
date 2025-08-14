@@ -12,6 +12,7 @@ object frmPrincipal: TfrmPrincipal
   Font.Style = []
   Position = poMainFormCenter
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnShow = FormShow
   TextHeight = 15
   object lblPedidoItens: TLabel

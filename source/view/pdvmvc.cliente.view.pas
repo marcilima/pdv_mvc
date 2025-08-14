@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
-  pdvmvc.connection.model.interfaces;
+  pdvmvc.connection.model.interfaces, pdvmvc.dependencycontainer.utils.impl;
 
 type
   TFrmCliente = class(TForm)
@@ -51,9 +51,8 @@ begin
   LEntityManager := TEntityManager.New(LConexao);
 
   try
-    LConexao.StartTransaction;
-
-    LCliente := LEntityManager.Entity.Cliente;
+    LConexao.StartTransaction;    ;
+    LCliente := Container.Resolve<ICliente>;
 
     LCliente.Nome := edtNomeCliente.Text;
     LCliente.Cidade := edtCidade.Text;

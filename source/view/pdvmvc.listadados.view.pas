@@ -10,7 +10,8 @@ uses
   Vcl.StdCtrls, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
   pdvmvc.dao.controller.interfaces, Vcl.ExtCtrls,
   pdvmvc.connection.model.interfaces,
-  pdvmvc.firedac.connection.model.impl;
+  pdvmvc.firedac.connection.model.impl, pdvmvc.model.entity.interfaces,
+  pdvmvc.dependencycontainer.utils.impl;
 
 type
   TDadosExibir = (deProduto, deCliente, dePedido, dePedidoItens);
@@ -67,23 +68,27 @@ begin
 end;
 
 procedure TFrmListaDados.ListarClientes;
+var
+  LCliente: ICliente;
 begin
     lblListaDe.Caption := 'Lista de Clientes';
-  var LCliente := FEntityManager.Entity.Cliente;
+  LCliente := Container.Resolve<ICliente>;
   dsListaDados.DataSet := FEntityManager.FindByAll(LCliente);
 end;
 
 procedure TFrmListaDados.ListarPedidoItens;
+var
+  LPedidoItens: IPedidoItem;
 begin
   lblListaDe.Caption := 'Lista de Itens do Pedido';
-  var LPedidoItens := FEntityManager.Entity.PedidoItem;
+  LPedidoItens := Container.Resolve<IPedidoItem>;
   dsListaDados.DataSet := FEntityManager.FindByAll(LPedidoItens);
 end;
 
 procedure TFrmListaDados.ListarPedidos;
 begin
   lblListaDe.Caption := 'Lista de Pedidos';
-  var LPedido := FEntityManager.Entity.Pedido;
+  var LPedido := Container.Resolve<IPedido>;
   dsListaDados.DataSet := FEntityManager.FindByAll(LPedido);
 
 end;
@@ -91,7 +96,7 @@ end;
 procedure TFrmListaDados.ListarProdutos;
 begin
   lblListaDe.Caption := 'Lista de Produtos';
-  var LProduto := FEntityManager.Entity.Produto;
+  var LProduto := Container.Resolve<IProduto>;
   dsListaDados.DataSet := FEntityManager.FindByAll(LProduto);
 end;
 

@@ -15,7 +15,8 @@ uses
   Vcl.ExtCtrls,
   pdvmvc.dao.controller.interfaces,
   pdvmvc.model.entity.interfaces, Vcl.Mask, Vcl.DBCtrls, Vcl.Buttons,
-  pdvmvc.connection.model.interfaces;
+  pdvmvc.connection.model.interfaces,
+  pdvmvc.dependencycontainer.utils.impl;
 
 type
   TfrmPrincipal = class(TForm)
@@ -72,6 +73,7 @@ type
     procedure edtCodigoClienteChange(Sender: TObject);
     procedure sbLimparClienteClick(Sender: TObject);
     procedure dbgPedidoItensDblClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }
     FPedido: IPedido;
@@ -115,7 +117,7 @@ begin
   btnAdicionar.Caption := 'Adicionar';
   var LConexao := TConnectionFiredac.New;
   var LEntityManager := TEntityManager.New(LConexao);
-  var LProduto := LEntityManager.Entity.Produto;
+  var LProduto := Container.Resolve<IProduto>;
 
   LDSProdutos := LEntityManager.FindByAll(LProduto);
 
@@ -184,7 +186,7 @@ begin
   FPedido.CodigoCliente := StrToIntDef(edtCodigoCliente.Text, 0);
   var LConexao := TConnectionFiredac.New;
   var LDaoController := TEntityManager.New(LConexao);
-  var LCliente := LDaoController.Entity.Cliente;
+  var LCliente := Container.Resolve<ICliente>;
 
 
   LDataSetCliente := LDaoController.FindByAll(LCliente);
@@ -194,7 +196,7 @@ begin
 
   var LEntityManager := TEntityManager.New(LConexao);
 
-  var LPedidoItens := LEntityManager.Entity.PedidoItem;
+  var LPedidoItens := Container.Resolve<IPedidoItem>;
   LDataSet := LEntityManager.FindByAll(LPedidoItens);
 
   PreencherDSPedidoItens(LDataSet);
@@ -235,7 +237,7 @@ begin
   begin
 
     var LEntityManager :=  TEntityManager.New(LConexao);
-    var LItem := LEntityManager.Entity.PedidoItem;
+    var LItem := Container.Resolve<IPedidoItem>;
     LItem.Codigo := mTblItens.FieldByName('CODIGO').AsInteger;
 
     if LItem.Codigo > 0 then
@@ -249,7 +251,7 @@ begin
 
   LimparDadosPedido;
 
-  FPedido := TPedido.New;
+  FPedido := Container.Resolve<IPedido>;
 
 end;
 
@@ -265,7 +267,7 @@ begin
 
   var LConexao := TConnectionFiredac.New;
   LEntityManager :=  TEntityManager.New(LConexao);
-  var LItem := LEntityManager.Entity.PedidoItem;
+  var LItem := Container.Resolve<IPedidoItem>;
 
   LItem.Codigo := mTblItens.FieldByName('CODIGO').AsInteger;
 
@@ -328,7 +330,14 @@ end;
 
 procedure TfrmPrincipal.FormCreate(Sender: TObject);
 begin
-  FPedido := TPedido.New;
+  TDependencyContainer.New;
+
+  FPedido := Container.Resolve<IPedido>;
+end;
+
+procedure TfrmPrincipal.FormDestroy(Sender: TObject);
+begin
+  Container.Free;
 end;
 
 procedure TfrmPrincipal.FormShow(Sender: TObject);
@@ -347,7 +356,7 @@ begin
   while not mTblItens.Eof do
   begin
     var LEntityManager := TEntityManager.New(AConexao);
-    var LItem := LEntityManager.Entity.PedidoItem;
+    var LItem := Container.Resolve<IPedidoItem>;
 
     LItem.Codigo := mTblItens.FieldByName('CODIGO').AsInteger;
     LItem.CodigoProduto := mTblItens.FieldByName('CODIGO_PRODUTO').AsInteger;
@@ -372,7 +381,7 @@ end;
 
 procedure TfrmPrincipal.LimparDadosPedido;
 begin
-  FPedido := TPedido.New;
+  FPedido := Container.Resolve<IPedido>;
   edtNumeroPedido.Clear;
 
   edtCodigoCliente.Clear;
@@ -395,7 +404,7 @@ begin
   var LConexao := TConnectionFiredac.New;
   var LEntityManager := TEntityManager.New(LConexao);
 
-  var LProduto := LEntityManager.Entity.Produto;
+  var LProduto := Container.Resolve<IProduto>;
   LDSProdutos := LEntityManager.FindByAll(LProduto);
 
   while not ADS.Eof do

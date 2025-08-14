@@ -13,7 +13,6 @@ uses
 type
   TEntityManager = class(TInterfacedObject, IEntityManager)
   private
-    FEntity: IEntity;
     FDAO: IDAOGenerico;
     FConexao: IConnection;
     constructor Create(AConexao: IConnection);
@@ -21,7 +20,6 @@ type
   public
     class function New(AConexao: IConnection): IEntityManager;
 
-    function Entity: IEntity;
     function Salvar(AValue: IInterface): IDAOGenerico;
     procedure Excluir(AValue: IInterface);
     function FindByAll(AValue: IInterface): TDataSet;
@@ -57,14 +55,6 @@ destructor TEntityManager.Destroy;
 begin
 
   inherited;
-end;
-
-function TEntityManager.Entity: IEntity;
-begin
-  if not Assigned(FEntity) then
-    FEntity := TEntity.new;
-
-  Result := FEntity;
 end;
 
 procedure TEntityManager.Excluir(AValue: IInterface);

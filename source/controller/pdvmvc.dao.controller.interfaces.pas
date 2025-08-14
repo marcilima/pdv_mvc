@@ -9,7 +9,6 @@ uses
 
 type
   IEntityManager = interface
-    function Entity: IEntity;
     function Salvar(AValue: IInterface): IDAOGenerico;
     function FindByAll(AValue: IInterface): TDataSet;
     procedure Excluir(AValue: IInterface);

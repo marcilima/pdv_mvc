@@ -24,7 +24,8 @@ uses
   pdvmvc.utils.impl in 'source\utils\impl\pdvmvc.utils.impl.pas',
   pdvmvc.cliente.view in 'source\view\pdvmvc.cliente.view.pas' {FrmCliente},
   pdvmvc.produto.view in 'source\view\pdvmvc.produto.view.pas' {FrmProduto},
-  pdvmvc.listadados.view in 'source\view\pdvmvc.listadados.view.pas' {FrmListaDados};
+  pdvmvc.listadados.view in 'source\view\pdvmvc.listadados.view.pas' {FrmListaDados},
+  pdvmvc.dependencycontainer.utils.impl in 'source\utils\impl\pdvmvc.dependencycontainer.utils.impl.pas';
 
 {$R *.res}
 

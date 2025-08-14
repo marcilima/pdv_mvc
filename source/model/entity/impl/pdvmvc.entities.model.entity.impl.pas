@@ -2,9 +2,9 @@ unit pdvmvc.entities.model.entity.impl;
 
 interface
 
-uses pdvmvc.model.entity.interfaces, pdvmvc.cliente.model.entity.impl,
+{uses pdvmvc.model.entity.interfaces, pdvmvc.cliente.model.entity.impl,
   pdvmvc.pedidoitem.model.entity.impl, pdvmvc.produto.model.entity.impl,
-  pdvmvc.pedido.model.entity.impl;
+  pdvmvc.pedido.model.entity.impl, pdvmvc.dependencycontainer.utils.impl;
 
 type
   TEntity = class(TInterfacedObject, IEntity)
@@ -21,10 +21,10 @@ type
     function Pedido: IPedido;
     function PedidoItem: IPedidoItem;
   end;
-
+           }
 implementation
+            {
 
-{ TEntity }
 
 function TEntity.Cliente: ICliente;
 begin
@@ -42,7 +42,7 @@ end;
 function TEntity.Pedido: IPedido;
 begin
   if not Assigned(FPedido) then
-    FPedido := TPedido.New;
+    FPedido := Container.Resolve<IPedido>;
 
   Result := FPedido;
 end;
@@ -62,5 +62,5 @@ begin
 
   Result := FProduto;
 end;
-
+   }
 end.

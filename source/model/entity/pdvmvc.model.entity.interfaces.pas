@@ -94,13 +94,13 @@ type
 
   end;
 
-  IEntity = interface
-    ['{3FD6739D-1450-48C2-99CF-EA65B766695F}']
-    function Cliente: ICliente;
-    function Produto: IProduto;
-    function Pedido: IPedido;
-    function PedidoItem: IPedidoItem;
-  end;
+//  IEntity = interface
+//    ['{3FD6739D-1450-48C2-99CF-EA65B766695F}']
+//    function Cliednte: ICliente;
+//    function Prodduto: IProduto;
+//    function Pediddo: IPedido;
+//    function PediddoItem: IPedidoItem;
+//  end;
 
 implementation
 
