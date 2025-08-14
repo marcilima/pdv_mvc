@@ -17,10 +17,10 @@ type
     FLista: TDictionary<string, Variant>;
     FId: Integer;
   public
-    constructor Create(AParent: IInterface);
+    constructor Create(AParent: IInterface; AConexao: IConnection);
     destructor Destroy; override;
 
-    class function New(AParent: IInterface): IDAOGenerico;
+    class function New(AParent: IInterface; AConexao: IConnection): IDAOGenerico;
 
     function GetId: Integer;
 
@@ -30,7 +30,6 @@ type
     procedure Update;
     function Insert: IDAOGenerico;
 
-    function GetConexao: IConnection;
   end;
 
 implementation
@@ -39,10 +38,10 @@ uses
   pdvmvc.firedac.connection.model.impl, pdvmvc.query.connection.model.impl,
   pdvmvc.utils.impl;
 
-constructor TDAOGenerico.Create(AParent: IInterface);
+constructor TDAOGenerico.Create(AParent: IInterface; AConexao: IConnection);
 begin
   FParent := AParent;
-  FConexao := TConnectionFiredac.New;
+  FConexao := AConexao;
   FQuery := TQuery.New(FConexao);
 
   FLista := TDictionary<string, Variant>.Create;
@@ -76,11 +75,6 @@ begin
   Result := FQuery.OpenQry(LSqlSelect, FLista);
 end;
 
-function TDAOGenerico.GetConexao: IConnection;
-begin
-  Result := FConexao;
-end;
-
 function TDAOGenerico.GetId: Integer;
 begin
   Result := FId;
@@ -94,9 +88,9 @@ begin
   Result := Self;
 end;
 
-class function TDAOGenerico.New(AParent: IInterface): IDAOGenerico;
+class function TDAOGenerico.New(AParent: IInterface; AConexao: IConnection): IDAOGenerico;
 begin
-  Result := Self.Create(AParent);
+  Result := Self.Create(AParent, AConexao);
 end;
 
 procedure TDAOGenerico.Update;

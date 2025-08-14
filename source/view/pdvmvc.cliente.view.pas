@@ -4,7 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
+  pdvmvc.connection.model.interfaces;
 
 type
   TFrmCliente = class(TForm)
@@ -29,7 +30,8 @@ type
 implementation
 
 uses
-  pdvmvc.controller.impl;
+  pdvmvc.dao.controller.impl, pdvmvc.firedac.connection.model.impl,
+  pdvmvc.dao.controller.interfaces, pdvmvc.model.entity.interfaces;
 
 {$R *.dfm}
 
@@ -39,17 +41,35 @@ begin
 end;
 
 procedure TFrmCliente.SalvarCliente;
+var
+  LConexao: IConnection;
+  LDAOController: IDAOController;
+  LCliente: ICliente;
 begin
-  var LController := TDAOController.New;
-  var LCliente := LController.Entity.Cliente;
+  LConexao := TConnectionFiredac.New;
 
-  LCliente.Nome := edtNomeCliente.Text;
-  LCliente.Cidade := edtCidade.Text;
-  LCliente.UF := edtUF.Text;
+  LDAOController := TDAOController.New(LConexao);
 
-  LCliente.Codigo := LController.Salvar(LCliente).GetId;
+  try
+    LConexao.StartTransaction;
 
-  edtCodigoCliente.Text := IntToStr(LCliente.Codigo);
+    LCliente := LDAOController.Entity.Cliente;
+
+    LCliente.Nome := edtNomeCliente.Text;
+    LCliente.Cidade := edtCidade.Text;
+    LCliente.UF := edtUF.Text;
+
+    LCliente.Codigo := LDAOController.Salvar(LCliente).GetId;
+
+    edtCodigoCliente.Text := IntToStr(LCliente.Codigo);
+    LConexao.CommitTrasaction;
+  except
+    on e: Exception do
+    begin
+      LConexao.RollBackTransaction;
+    end;
+
+  end;
 end;
 
 { TFrmCliente }
@@ -61,7 +81,7 @@ begin
   LFrm := TFrmCliente.Create(nil);
 
   try
-    LFrm.ShowModal
+    LFrm.ShowModal;
   finally
     FreeAndNil(LFrm);
   end;

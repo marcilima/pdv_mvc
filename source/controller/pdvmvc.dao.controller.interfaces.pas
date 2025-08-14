@@ -1,4 +1,4 @@
-unit pdvmvc.controller.interfaces;
+unit pdvmvc.dao.controller.interfaces;
 
 interface
 
@@ -8,7 +8,7 @@ uses
   Data.DB;
 
 type
-  IControllerDAO = interface
+  IDAOController = interface
     function Entity: IEntity;
     function Salvar(AValue: IInterface): IDAOGenerico;
     function FindByAll(AValue: IInterface): TDataSet;

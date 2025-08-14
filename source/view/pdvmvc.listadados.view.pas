@@ -8,7 +8,9 @@ uses
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
   Vcl.StdCtrls, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
-  pdvmvc.controller.interfaces, Vcl.ExtCtrls;
+  pdvmvc.dao.controller.interfaces, Vcl.ExtCtrls,
+  pdvmvc.connection.model.interfaces,
+  pdvmvc.firedac.connection.model.impl;
 
 type
   TDadosExibir = (deProduto, deCliente, dePedido, dePedidoItens);
@@ -26,7 +28,8 @@ type
     procedure dbgListaDadosDblClick(Sender: TObject);
   private
     { Private declarations }
-    FControllerDAO: IControllerDAO;
+    FConexao: IConnection;
+    FControllerDAO: IDAOController;
     procedure ListarPedidos;
     procedure ListarPedidoItens;
     procedure ListarClientes;
@@ -41,7 +44,7 @@ type
 implementation
 
 uses
-  pdvmvc.controller.impl;
+  pdvmvc.dao.controller.impl;
 {$R *.dfm}
 
 { TFrmListaDados }
@@ -59,7 +62,8 @@ end;
 
 procedure TFrmListaDados.FormCreate(Sender: TObject);
 begin
-  FControllerDAO := TDAOController.New;
+  FConexao := TConnectionFiredac.New;
+  FControllerDAO := TDAOController.New(FConexao);
 end;
 
 procedure TFrmListaDados.ListarClientes;

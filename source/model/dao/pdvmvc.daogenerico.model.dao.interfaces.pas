@@ -14,8 +14,6 @@ type
     procedure Update;
     function Insert: IDAOGenerico;
     function GetId: Integer;
-
-    function GetConexao: IConnection;
   end;
 
 implementation

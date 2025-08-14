@@ -1,7 +1,7 @@
 object frmPrincipal: TfrmPrincipal
   Left = 0
   Top = 0
-  Caption = 'frmPrincipal'
+  Caption = 'Pedido de Venda'
   ClientHeight = 633
   ClientWidth = 1056
   Color = clBtnFace
@@ -35,7 +35,7 @@ object frmPrincipal: TfrmPrincipal
     Caption = 'Quantidade'
   end
   object Label5: TLabel
-    Left = 471
+    Left = 455
     Top = 152
     Width = 71
     Height = 15
@@ -98,7 +98,7 @@ object frmPrincipal: TfrmPrincipal
       end>
   end
   object btnAdicionar: TButton
-    Left = 616
+    Left = 582
     Top = 172
     Width = 75
     Height = 25
@@ -109,13 +109,13 @@ object frmPrincipal: TfrmPrincipal
   object edtQuantidade: TEdit
     Left = 344
     Top = 173
-    Width = 121
+    Width = 105
     Height = 23
     TabOrder = 2
     Text = '1'
   end
   object edtValorUnitario: TEdit
-    Left = 471
+    Left = 455
     Top = 173
     Width = 121
     Height = 23
@@ -159,13 +159,13 @@ object frmPrincipal: TfrmPrincipal
   object GroupBox2: TGroupBox
     Left = 8
     Top = 86
-    Width = 497
+    Width = 441
     Height = 60
     Caption = 'Cliente'
     TabOrder = 5
     object sbLimparCliente: TSpeedButton
       Left = 314
-      Top = 16
+      Top = 18
       Width = 23
       Height = 22
       Caption = 'X'
@@ -207,7 +207,7 @@ object frmPrincipal: TfrmPrincipal
     Align = alBottom
     TabOrder = 6
     object btnCadastrarProduto: TButton
-      Left = 831
+      Left = 904
       Top = 8
       Width = 137
       Height = 25
@@ -216,7 +216,7 @@ object frmPrincipal: TfrmPrincipal
       OnClick = btnCadastrarProdutoClick
     end
     object btnCadastrarCliente: TButton
-      Left = 688
+      Left = 761
       Top = 8
       Width = 137
       Height = 25
@@ -270,8 +270,8 @@ object frmPrincipal: TfrmPrincipal
     OnClick = btnExcluirItemClick
   end
   object DBLabeledEdit1: TDBLabeledEdit
-    Left = 8
-    Top = 488
+    Left = 777
+    Top = 408
     Width = 121
     Height = 23
     DataField = 'TOTALITENS'
@@ -280,7 +280,9 @@ object frmPrincipal: TfrmPrincipal
     TabOrder = 10
     EditLabel.Width = 66
     EditLabel.Height = 15
+    EditLabel.BiDiMode = bdLeftToRight
     EditLabel.Caption = 'Total Pedido'
+    EditLabel.ParentBiDiMode = False
   end
   object btnAlterarItem: TButton
     Left = 904

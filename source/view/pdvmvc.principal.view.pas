@@ -10,11 +10,12 @@ uses
   FireDAC.Stan.Async, FireDAC.DApt, FireDAC.UI.Intf, FireDAC.Stan.Def,
   FireDAC.Stan.Pool, FireDAC.Phys, FireDAC.VCLUI.Wait, FireDAC.Comp.Client,
   FireDAC.Comp.DataSet, pdvmvc.cliente.model.entity.impl,
-  pdvmvc.query.utils.impl, pdvmvc.controller.impl, FireDAC.Stan.ExprFuncs,
+  pdvmvc.query.utils.impl, pdvmvc.dao.controller.impl, FireDAC.Stan.ExprFuncs,
   FireDAC.Phys.SQLiteWrapper.Stat, FireDAC.Phys.SQLiteDef, FireDAC.Phys.SQLite,
   Vcl.ExtCtrls,
-  pdvmvc.controller.interfaces,
-  pdvmvc.model.entity.interfaces, Vcl.Mask, Vcl.DBCtrls, Vcl.Buttons;
+  pdvmvc.dao.controller.interfaces,
+  pdvmvc.model.entity.interfaces, Vcl.Mask, Vcl.DBCtrls, Vcl.Buttons,
+  pdvmvc.connection.model.interfaces;
 
 type
   TfrmPrincipal = class(TForm)
@@ -75,7 +76,7 @@ type
     FPedido: IPedido;
     FRecnoItem: Integer;
     procedure PreencherDSPedidoItens(ADS: TDataSet);
-    procedure GravarItensPedido;
+    procedure GravarItensPedido(AConexao: IConnection);
     procedure LimparDadosPedido;
   public
     { Public declarations }
@@ -92,7 +93,8 @@ uses
   pdvmvc.cliente.view,
   pdvmvc.produto.view,
   pdvmvc.listadados.view,
-  pdvmvc.pedido.model.entity.impl;
+  pdvmvc.pedido.model.entity.impl,
+  pdvmvc.firedac.connection.model.impl;
 
 procedure TfrmPrincipal.btnAdicionarClick(Sender: TObject);
 var
@@ -101,9 +103,11 @@ var
 begin
 
   btnAdicionar.Caption := 'Adicionar';
-  var LControllerDAO := TDAOController.New;
+  var LConexao := TConnectionFiredac.New;
+  var LControllerDAO := TDAOController.New(LConexao);
   var LProduto := LControllerDAO.Entity.Produto;
-  LDSProdutos := TDAOController.New.FindByAll(LProduto);
+
+  LDSProdutos := LControllerDAO.FindByAll(LProduto);
 
   if LDSProdutos.Locate('CODIGO', StrToIntDef(edtCodigoProduto.Text, 0), []) then
       LDescricaoProduto := LDSProdutos.FieldByName('DESCRICAO').AsString;
@@ -126,26 +130,13 @@ begin
 
   FRecnoItem := 0;
 
-  {var LPedidoItem: IPedidoItem;
-  LPedidoItem := FControllerDAO.Entity.PedidoItem;
-
-  LPedidoItem.CodigoProduto := StrToIntDef(edtCodigoProduto.Text, 0);
-  LPedidoItem.Quantidade := StrToIntDef(edtQuantidade.Text, 0);
-  LPedidoItem.ValorUnitario := StrToCurrDef(edtValorUnitario.Text, 0);
-  LPedidoItem.ValorTotal := LPedidoItem.Quantidade * LPedidoItem.ValorUnitario;
-  try
-    FPedido.AdicionarItem(LPedidoItem);
-
-  except
-    on e: Exception do
-      Application.MessageBox(PChar(e.Message), 'Atenção', 48);
-    
-  end; }
-
 end;
 
 procedure TfrmPrincipal.btnAlterarItemClick(Sender: TObject);
 begin
+  if mTblItens.IsEmpty then
+    Exit;
+
   FRecnoItem := mTblItens.RecNo;
 
   edtCodigoProduto.Text := mTblItens.FieldByName('CODIGO_PRODUTO').AsString;
@@ -180,15 +171,17 @@ begin
 
   FPedido.NumeroPedido := StrToIntDef(edtNumeroPedido.Text, 0);
   FPedido.CodigoCliente := StrToIntDef(edtCodigoCliente.Text, 0);
-
-  var LDaoController := TDAOController.New;
+  var LConexao := TConnectionFiredac.New;
+  var LDaoController := TDAOController.New(LConexao);
   var LCliente := LDaoController.Entity.Cliente;
+
+
   LDataSetCliente := LDaoController.FindByAll(LCliente);
   if LDataSetCliente.Locate('CODIGO', FPedido.CodigoCliente, []) then
     edtNomeCliente.Text := LDataSetCliente.FieldByName('NOME').AsString;
 
 
-  var LControllerDAO := TDAOController.New;
+  var LControllerDAO := TDAOController.New(LConexao);
 
   var LPedidoItens := LControllerDAO.Entity.PedidoItem;
   LDataSet := LControllerDAO.FindByAll(LPedidoItens);
@@ -224,10 +217,13 @@ begin
   if not (MessageDlg('Deseja Cancelar o pedido?', mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
     Exit;
 
+  var LConexao := TConnectionFiredac.New;
+
   mTblItens.First;
   while not mTblItens.Eof do
   begin
-    var LControllerDAO :=  TDAOController.New;
+
+    var LControllerDAO :=  TDAOController.New(LConexao);
     var LItem := LControllerDAO.Entity.PedidoItem;
     LItem.Codigo := mTblItens.FieldByName('CODIGO').AsInteger;
 
@@ -237,7 +233,7 @@ begin
      mTblItens.Next;
   end;
 
-  var LControllerDAO :=  TDAOController.New;
+  var LControllerDAO :=  TDAOController.New(LConexao);
   LControllerDAO.Excluir(FPedido);
 
   LimparDadosPedido;
@@ -248,13 +244,17 @@ end;
 
 procedure TfrmPrincipal.btnExcluirItemClick(Sender: TObject);
 var
-  LControllerDAO: IControllerDAO;
+  LControllerDAO: IDAOController;
 begin
-  if not (MessageDlg('Deseja Excluir o item do pedido?', mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
+  if mTblItens.IsEmpty then
     Exit;
 
-  LControllerDAO :=  TDAOController.New;
+  if not (MessageDlg('Deseja Excluir o item do pedido?', mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
+    Exit;
+  var LConexao := TConnectionFiredac.New;
+  LControllerDAO :=  TDAOController.New(LConexao);
   var LItem := LControllerDAO.Entity.PedidoItem;
+
   LItem.Codigo := mTblItens.FieldByName('CODIGO').AsInteger;
 
   if LItem.Codigo > 0 then
@@ -266,23 +266,38 @@ end;
 
 procedure TfrmPrincipal.btnSalvarPedidoClick(Sender: TObject);
 begin
-  var LControllerDAO := TDAOController.New;
+  var LConexao := TConnectionFiredac.New;
+  var LControllerDAO := TDAOController.New(LConexao);
+  LConexao.StartTransaction;
 
   FPedido.CodigoCliente := StrToIntDef(edtCodigoCliente.Text, 0);
   FPedido.ValorTotal := StrToCurrDef(mTblItens.FieldByName('TOTALITENS').AsString, 0);
 
-  if not (FPedido.NumeroPedido > 0) then
-  begin
-    FPedido.DataEmissao := Now;
-    FPedido.NumeroPedido := LControllerDAO.Salvar(FPedido).GetId;
-    edtNumeroPedido.Text := IntToStr(FPedido.NumeroPedido);
-  end
-  else
-    LControllerDAO.Salvar(FPedido).GetId;
+  try
+    if not (FPedido.NumeroPedido > 0) then
+    begin
+      FPedido.DataEmissao := Now;
+      FPedido.NumeroPedido := LControllerDAO.Salvar(FPedido).GetId;
+      edtNumeroPedido.Text := IntToStr(FPedido.NumeroPedido);
+    end
+    else
+      LControllerDAO.Salvar(FPedido).GetId;
 
-  GravarItensPedido;
+    GravarItensPedido(LConexao);
 
-  ShowMessage('Pedido Salvo com Sucesso!');
+    LConexao.CommitTrasaction;
+    ShowMessage('Pedido Salvo com Sucesso!');
+  except
+    on e: Exception do
+    begin
+      LConexao.RollBackTransaction;
+      ShowMessage('Erro ao tentar salvar pedido!');
+    end
+    else
+      LConexao.RollBackTransaction;
+
+  end;
+
 end;
 
 procedure TfrmPrincipal.edtCodigoClienteChange(Sender: TObject);
@@ -305,7 +320,7 @@ begin
   mTblItens.EmptyDataSet;
 end;
 
-procedure TfrmPrincipal.GravarItensPedido;
+procedure TfrmPrincipal.GravarItensPedido(AConexao: IConnection);
 var
   LId: Integer;
 begin
@@ -314,7 +329,7 @@ begin
 
   while not mTblItens.Eof do
   begin
-    var LControllerDAO := TDAOController.New;
+    var LControllerDAO := TDAOController.New(AConexao);
     var LItem := LControllerDAO.Entity.PedidoItem;
 
     LItem.Codigo := mTblItens.FieldByName('CODIGO').AsInteger;
@@ -360,14 +375,14 @@ var
 
 begin
   mTblItens.EmptyDataSet;
-  var LControllerDAO := TDAOController.New;
+  var LConexao := TConnectionFiredac.New;
+  var LControllerDAO := TDAOController.New(LConexao);
 
   var LProduto := LControllerDAO.Entity.Produto;
-  LDSProdutos := TDAOController.New.FindByAll(LProduto);
+  LDSProdutos := LControllerDAO.FindByAll(LProduto);
 
   while not ADS.Eof do
   begin
-
 
     if ADS.FieldByName('NUMERO_PEDIDO').AsInteger <> FPedido.NumeroPedido then
     begin

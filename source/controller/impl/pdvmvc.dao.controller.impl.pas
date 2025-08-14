@@ -1,23 +1,25 @@
-unit pdvmvc.controller.impl;
+unit pdvmvc.dao.controller.impl;
 
 interface
 
 uses
-  pdvmvc.controller.interfaces,
+  Data.DB,
+  pdvmvc.dao.controller.interfaces,
   pdvmvc.model.entity.interfaces,
   pdvmvc.daogenerico.model.dao.interfaces,
   pdvmv.daogenerico.model.dao.impl,
-  Data.DB;
+  pdvmvc.connection.model.interfaces;
 
 type
-  TDAOController = class(TInterfacedObject, IControllerDAO)
+  TDAOController = class(TInterfacedObject, IDAOController)
   private
     FEntity: IEntity;
     FDAO: IDAOGenerico;
-  public
-    constructor Create;
+    FConexao: IConnection;
+    constructor Create(AConexao: IConnection);
     destructor Destroy; override;
-    class function New: IControllerDAO;
+  public
+    class function New(AConexao: IConnection): IDAOController;
 
     function Entity: IEntity;
     function Salvar(AValue: IInterface): IDAOGenerico;
@@ -33,15 +35,15 @@ uses
 
 { TController }
 
-constructor TDAOController.Create;
+constructor TDAOController.Create(AConexao: IConnection);
 begin
-
+  FConexao := AConexao;
 end;
 
 function TDAOController.Salvar(AValue: IInterface): IDAOGenerico;
 begin
   if not Assigned(FDAO) then
-    FDAO := TDAOGenerico.New(AValue);
+    FDAO := TDAOGenerico.New(AValue, FConexao);
 
   if TUtils.New(AValue).QueryUtils.IdPrenchido then
     FDAO.Update
@@ -68,7 +70,7 @@ end;
 procedure TDAOController.Excluir(AValue: IInterface);
 begin
   if not Assigned(FDAO) then
-    FDAO := TDAOGenerico.New(AValue);
+    FDAO := TDAOGenerico.New(AValue, FConexao);
 
   FDAO.Delete;
 end;
@@ -76,14 +78,14 @@ end;
 function TDAOController.FindByAll(AValue: IInterface): TDataSet;
 begin
   if not Assigned(FDAO) then
-    FDAO := TDAOGenerico.New(AValue);
+    FDAO := TDAOGenerico.New(AValue, FConexao);
 
   Result := FDAO.FindByAll;
 end;
 
-class function TDAOController.New: IControllerDAO;
+class function TDAOController.New(AConexao: IConnection): IDAOController;
 begin
-  Result := Self.Create;
+  Result := Self.Create(AConexao);
 end;
 
 end.

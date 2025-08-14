@@ -143,8 +143,8 @@
         <DCCReference Include="source\utils\impl\pdvmvc.query.utils.impl.pas"/>
         <DCCReference Include="source\utils\impl\pdvmvc.rttihelper.utils.pas"/>
         <DCCReference Include="source\utils\impl\pdvmvc.rttiatributo.utils.pas"/>
-        <DCCReference Include="source\controller\pdvmvc.controller.interfaces.pas"/>
-        <DCCReference Include="source\controller\impl\pdvmvc.controller.impl.pas"/>
+        <DCCReference Include="source\controller\pdvmvc.dao.controller.interfaces.pas"/>
+        <DCCReference Include="source\controller\impl\pdvmvc.dao.controller.impl.pas"/>
         <DCCReference Include="source\utils\impl\pdvmvc.utils.impl.pas"/>
         <DCCReference Include="source\view\pdvmvc.cliente.view.pas">
             <Form>FrmCliente</Form>

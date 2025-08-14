@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, pdvmvc.controller.impl;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, pdvmvc.dao.controller.impl;
 
 type
   TFrmProduto = class(TForm)
@@ -28,6 +28,10 @@ type
 
 implementation
 
+uses
+  pdvmvc.connection.model.interfaces,
+  pdvmvc.firedac.connection.model.impl;
+
 {$R *.dfm}
 
 { TFrmProduto }
@@ -43,8 +47,12 @@ begin
 end;
 
 procedure TFrmProduto.SalvarProduto;
+var
+  LConexao: IConnection;
 begin
-  var LController := TDAOController.New;
+  LConexao := TConnectionFiredac.New;
+
+  var LController := TDAOController.New(LConexao);
   var LProduto := LController.Entity.Produto;
 
   LProduto.Descricao := edtDescricao.Text;
@@ -62,7 +70,7 @@ begin
   LFrm := TFrmProduto.Create(nil);
 
   try
-    LFrm.ShowModal
+    LFrm.ShowModal;
   finally
     FreeAndNil(LFrm);
   end;
